@@ -121,7 +121,7 @@ obj.homepage = 'https://github.com/gzliew/WindowSwitcher.spoon'
 obj.license = 'MIT - https://opensource.org/licenses/MIT'
 
 function obj:init()
-  hs.hotkey.bind({"cmd", "ctrl"}, "s", function()
+  hs.hotkey.bind({"ctrl", "alt"}, "space", function()
     windowFuzzySearch()
   end)
 end
