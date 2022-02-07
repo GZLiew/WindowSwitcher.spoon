@@ -3,6 +3,7 @@
 _fuzzyChoices = nil
 _fuzzyChooser = nil
 _fuzzyLastWindow = nil
+_chooseShowHotkey = nil
 
 function fuzzyQuery(s, m)
 	s_index = 1
@@ -66,6 +67,20 @@ function _fuzzyPickWindow(item)
 	window:focus()
 end
 
+function onChooserShowCallback()
+  _chooseShowHotkey = hs.hotkey.bind({"ctrl"}, "m", function()
+    hs.eventtap.keyStroke({}, "return")
+  end)
+end
+
+function onChooserHideCallback()
+  if _chooseShowHotkey == nil then
+    return
+  end
+  _chooseShowHotkey:delete()
+  _chooseShowHotkey = nil
+end
+
 function windowFuzzySearch()
 	windows = hs.window.filter.default:getWindows(hs.window.filter.sortByFocusedLast)
 	-- windows = hs.window.orderedWindows()
@@ -88,7 +103,10 @@ function windowFuzzySearch()
 	end
 	_fuzzyLastWindow = hs.window.focusedWindow()
 	_fuzzyChooser = hs.chooser.new(_fuzzyPickWindow):choices(_fuzzyChoices):searchSubText(true)
+	_fuzzyChooser:subTextColor(hs.drawing.color.x11.snow)
 	_fuzzyChooser:queryChangedCallback(_fuzzyFilterChoices) -- Enable true fuzzy find
+	_fuzzyChooser:showCallback(onChooserShowCallback)
+	_fuzzyChooser:hideCallback(onChooserHideCallback)
 	_fuzzyChooser:show()
 end
 
@@ -103,7 +121,7 @@ obj.homepage = 'https://github.com/gzliew/WindowSwitcher.spoon'
 obj.license = 'MIT - https://opensource.org/licenses/MIT'
 
 function obj:init()
-  hs.hotkey.bind({"cmd", "ctrl"}, "p", function()
+  hs.hotkey.bind({"cmd", "ctrl"}, "s", function()
     windowFuzzySearch()
   end)
 end
