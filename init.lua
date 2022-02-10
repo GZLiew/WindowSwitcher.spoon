@@ -108,6 +108,7 @@ function windowFuzzySearch()
 	_fuzzyChooser:showCallback(onChooserShowCallback)
 	_fuzzyChooser:hideCallback(onChooserHideCallback)
 	_fuzzyChooser:show()
+  hs.eventtap.keyStroke({"ctrl"}, "n")
 end
 
 local obj={}
