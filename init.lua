@@ -3,7 +3,6 @@
 _fuzzyChoices = nil
 _fuzzyChooser = nil
 _fuzzyLastWindow = nil
-_chooseShowHotkey = nil
 
 function fuzzyQuery(s, m)
 	s_index = 1
@@ -48,7 +47,7 @@ function _fuzzyFilterChoices(query)
 		end
 	end
 	local sort_func = function( a,b ) return a["fzf_score"] > b["fzf_score"] end
-	table.sort( pickedChoices, sort_func )
+	table.sort(pickedChoices, sort_func)
 	_fuzzyChooser:choices(pickedChoices)
 end
 
@@ -67,18 +66,10 @@ function _fuzzyPickWindow(item)
 	window:focus()
 end
 
-function onChooserShowCallback()
-  _chooseShowHotkey = hs.hotkey.bind({"ctrl"}, "m", function()
-    hs.eventtap.keyStroke({}, "return")
-  end)
-end
-
-function onChooserHideCallback()
-  if _chooseShowHotkey == nil then
-    return
-  end
-  _chooseShowHotkey:delete()
-  _chooseShowHotkey = nil
+function swapPositions(dataTable, indexOne, indexTwo)
+  temp = dataTable[indexOne]
+  dataTable[indexOne] = dataTable[indexTwo]
+  dataTable[indexTwo] = temp
 end
 
 function windowFuzzySearch()
@@ -91,7 +82,7 @@ function windowFuzzySearch()
 		item = {
 			["text"] = app,
 			["subText"] = title,
-			--["image"] = w:snapshot(),
+			-- ["image"] = w:snapshot(),
 			["windowID"] = w:id()
 		}
 		-- Handle special cases as necessary
@@ -101,14 +92,14 @@ function windowFuzzySearch()
 			table.insert(_fuzzyChoices, item)
 		--end
 	end
+  -- swap first and second
+  swapPositions(_fuzzyChoices, 1, 2)
+
 	_fuzzyLastWindow = hs.window.focusedWindow()
 	_fuzzyChooser = hs.chooser.new(_fuzzyPickWindow):choices(_fuzzyChoices):searchSubText(true)
 	_fuzzyChooser:subTextColor(hs.drawing.color.x11.snow)
 	_fuzzyChooser:queryChangedCallback(_fuzzyFilterChoices) -- Enable true fuzzy find
-	_fuzzyChooser:showCallback(onChooserShowCallback)
-	_fuzzyChooser:hideCallback(onChooserHideCallback)
 	_fuzzyChooser:show()
-  hs.eventtap.keyStroke({"ctrl"}, "n")
 end
 
 local obj={}
